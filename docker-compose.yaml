@@ -1,0 +1,17 @@
+version: "3.9"
+
+services: 
+  rsyslog_server: 
+    build: 
+      context: .
+      dockerfile: Docker/Dockerfile
+    hostname: rsyslog 
+    container_name: rsyslog 
+    restart: always
+    volumes: 
+      - "/var/log/log_storage:/var/log/log_storage" 
+    ports: 
+      - "514:514"
+      - "514:514/udp"
+    cap_add:
+      - SYSLOG
