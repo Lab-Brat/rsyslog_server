@@ -5,8 +5,14 @@ More info about the container:
 ```
 Name: rsyslog
 Image: rsyslog_server
-Ports: 514 tcp and udp mapped to host
+Ports: 514 tcp mapped to host
 Storage: /var/log/log_storage mounted from host
+```
+
+#### Install container
+Server can be installed using Docker Compose:
+```console
+[vagrant@node0 ~]$ docker compose up -d
 ```
 
 #### Add client
