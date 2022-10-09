@@ -1,0 +1,8 @@
+---
+- name: Get package information.
+  package_facts:
+    manager: auto
+
+- name: Check if Docker is installed.
+  include_tasks: docker.yaml
+  when: "'docker-ce' not in ansible_facts.packages"
