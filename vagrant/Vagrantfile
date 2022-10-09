@@ -5,9 +5,19 @@ Vagrant.configure("2") do |config|
   
   servers=[
     {
-      :hostname => "node6",
+      :hostname => "rsyslog-client1.lab",
 	    :ip       => "192.168.56.133",
       :box      => "almalinux/8",
+      :boxname  => "client1",
+      :key      => "/vagrant/vg_box.pub",
+	    :ram      => "1024",
+	    :cpu      => 1
+    },
+    {
+      :hostname => "rsyslog-server.lab",
+	    :ip       => "192.168.56.132",
+      :box      => "almalinux/8",
+      :boxname  => "server.lab",
       :key      => "/vagrant/vg_box.pub",
 	    :ram      => "2048",
 	    :cpu      => 1
@@ -22,7 +32,7 @@ Vagrant.configure("2") do |config|
 	                 ip: machine[:ip],
 	                 name: "vboxnet0"
       node.vm.provider "virtualbox" do |vb|
-        vb.name = "rsyslog_client1"
+        vb.name = machine[:boxname]
         vb.gui = false
         vb.memory = machine[:ram]
         vb.cpus = machine[:cpu]
