@@ -1,0 +1,48 @@
+---
+- name: Install rsyslog
+  dnf:
+    name: 'rsyslog'
+    state: present
+
+- name: Start and enable rsyslog
+  service:
+    name: 'rsyslog'
+    state: started 
+    enabled: yes
+
+- name: Create directory for journald configuration files
+  file:
+    state: directory
+    path: '{{ journal_custom_conf }}'
+
+- name: Create a custom journald configuration
+  file:
+    state: touch
+    path: '{{ journal_custom_conf }}forward.conf'
+
+- name: Write custom journald configuration
+  copy:
+    dest: '{{ journal_custom_conf }}forward.conf'
+    content: |
+      [Journal]
+      ForwardToSyslog=yes
+  register: journal_change
+
+- name: Restart journald after configuration change
+  service:
+    name: 'systemd-journald'
+    state: restarted
+  when: journal_change.changed
+
+- name: Add rsyslog server info to configuration file
+  lineinfile:
+    dest: '{{ rsyslog_conf }}'
+    line: '*.*  @@{{ rsyslog_server }}:514'
+    create: yes
+  register: rsyslog_change
+
+- name: Restart rsyslog after configuration change
+  service:
+    name: 'rsyslog'
+    state: restarted
+  when: rsyslog_change.changed
