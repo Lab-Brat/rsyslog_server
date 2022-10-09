@@ -3,6 +3,26 @@
   package_facts:
     manager: auto
 
-- name: Check if Docker is installed.
+- name: Install Docker.
   include_tasks: docker.yaml
   when: "'docker-ce' not in ansible_facts.packages"
+
+- name: Create a folder for Docker Compose.
+  file:
+    dest: /opt/rsyslog_server/Docker
+    state: directory
+
+- name: Clone Docker Compose files.
+  get_url:
+    url:  "{{ item.url }}"
+    dest: "{{ item.dst }}"
+  loop:
+    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/docker-compose.yaml,
+       dst: /opt/rsyslog_server}
+    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/Dockerfile,
+       dst: /opt/rsyslog_server/Docker}
+    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/rsyslog.conf,
+       dst: /opt/rsyslog_server/Docker}
+
+- name: Run Docker Compose.
+  shell: "docker compose --project-directory /opt/rsyslog_server up -d"
