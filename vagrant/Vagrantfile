@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     {
       :hostname => "rsyslog-server.lab",
 	    :ip       => "192.168.56.132",
-      :box      => "almalinux/8",
+      :box      => "almalinux/9",
       :boxname  => "server",
       :key      => "/vagrant/vg_box.pub",
 	    :ram      => "2048",
