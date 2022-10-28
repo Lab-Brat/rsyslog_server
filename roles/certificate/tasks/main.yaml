@@ -1,0 +1,86 @@
+---
+- name: Install certtool.
+  dnf: 
+    name: 
+      - gnutls
+      - gnutls-utils
+    state: latest
+
+- name: Create a folder for certificates.
+  file:
+    path: "{{ cert_dir_remote }}"
+    state: directory
+  delegate_to: "{{ rsyslog_server }}"
+
+- name: Create CA template.
+  template:
+    src: roles/certificate/templates/ca.j2
+    dest: "{{ cert_dir_remote }}ca.cfg"
+  delegate_to: "{{ rsyslog_server }}"
+  when: new_CA == true
+
+- name: Create CA private key.
+  shell: >
+    certtool 
+    --generate-privkey 
+    --outfile {{ cert_dir_remote }}ca-key.pem
+  delegate_to: "{{ rsyslog_server }}"
+  when: new_CA == true
+
+- name: Create a CA certificate.
+  shell: >
+    certtool
+    --generate-self-signed
+    --load-privkey {{ cert_dir_remote }}ca-key.pem
+    --outfile {{ cert_dir_remote }}ca.pem
+    --template "{{ cert_dir_remote }}ca.cfg"
+  delegate_to: "{{ rsyslog_server }}"
+  when: new_CA == true
+
+- name: Create template for certtool command.
+  template:
+    src:  "roles/certificate/templates/client.j2"
+    dest: "{{ cert_dir_remote }}client.cfg"
+  delegate_to: "{{ rsyslog_server }}"
+
+- name: Generate a private key.
+  shell: >
+    certtool
+    --generate-privkey
+    --outfile {{ cert_dir_remote }}{{ ansible_nodename }}-key.pem
+    --sec-param Medium
+  delegate_to: "{{ rsyslog_server }}"
+
+- name: Create a certificate signing request.
+  shell: >
+    certtool
+    --generate-request
+    --load-privkey {{ cert_dir_remote }}{{ ansible_nodename }}-key.pem
+    --outfile {{ cert_dir_remote }}request.pem
+    --template {{ cert_dir_remote }}client.cfg
+  delegate_to: "{{ rsyslog_server }}"
+
+- name: Sign the certificate request with CA.
+  shell: >
+    certtool
+    --generate-certificate
+    --load-request {{ cert_dir_remote }}request.pem
+    --outfile {{ cert_dir_remote }}{{ ansible_nodename }}-cert.pem
+    --load-ca-certificate {{ cert_dir_remote }}ca.pem
+    --load-ca-privkey {{ cert_dir_remote }}ca-key.pem
+    --template {{ cert_dir_remote }}client.cfg
+  delegate_to: "{{ rsyslog_server }}"
+
+- name: Fetch certificates to local folder.
+  fetch:
+    src:  "{{ item.src }}"
+    dest: "{{ item.des }}"
+    flat: yes
+  loop:
+    - {src: "{{ cert_dir_remote }}{{ ansible_nodename }}-cert.pem",
+       des: "{{ cert_dir_local }}{{ ansible_nodename }}-cert.pem"}
+    - {src: "{{ cert_dir_remote }}{{ ansible_nodename }}-key.pem",
+       des: "{{ cert_dir_local }}{{ ansible_nodename }}-key.pem"}
+    - {src: "{{ cert_dir_remote }}ca.pem",
+       des: "{{ cert_dir_local }}ca.pem"}
+  delegate_to: "{{ rsyslog_server }}"

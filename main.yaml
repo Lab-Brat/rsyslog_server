@@ -1,5 +1,7 @@
 - hosts: all
   become: yes
+  vars:
+    - rsyslog_server: "192.168.56.132"
 
   roles:
     - role: client
@@ -7,10 +9,14 @@
         journal_conf: "/etc/systemd/journald.conf"
         journal_custom_conf: "/etc/systemd/journald.d/"
         rsyslog_conf: "/etc/rsyslog.conf"
-        rsyslog_server: "192.168.56.132"
       tags: client
 
     - role:  server 
       tags: server
         
-    # - role: certificate
+    - role: certificate
+      vars:
+        - cert_dir_remote: "/opt/rsyslog_certs/"
+        - cert_dir_local:  "certs/"
+        - new_CA: false
+      tags: cert
