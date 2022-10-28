@@ -5,12 +5,14 @@ services:
     build:
       context: .
       dockerfile: Docker/Dockerfile
-    hostname: rsyslog 
+    hostname: rsyslog.lab
     container_name: rsyslog 
     restart: always
     volumes: 
-      - "/var/log/log_storage:/var/log/log_storage" 
-    ports: 
-      - "514:514"
+      - "/var/log/log_storage:/var/log/log_storage"
+      - "/etc/pki/rsyslog:/etc/pki/rsyslog"
+      - "/opt/rsyslog_certs:/opt/rsyslog_certs"
+    ports:
+      - "51440:51440"
     cap_add:
       - SYSLOG

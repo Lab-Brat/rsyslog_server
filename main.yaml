@@ -11,7 +11,9 @@
         rsyslog_conf: "/etc/rsyslog.conf"
       tags: client
 
-    - role:  server 
+    - role: server 
+      vars:
+        - config_dir: /opt/rsyslog_server/
       tags: server
         
     - role: certificate

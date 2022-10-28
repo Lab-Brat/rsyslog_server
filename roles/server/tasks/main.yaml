@@ -1,4 +1,7 @@
 ---
+- name: Disable SELinux.
+  include_tasks: disable_selinux.yaml
+
 - name: Get package information.
   package_facts:
     manager: auto
@@ -7,22 +10,32 @@
   include_tasks: docker.yaml
   when: "'docker-ce' not in ansible_facts.packages"
 
-- name: Create a folder for Docker Compose.
+- name: Create a directory for Docker Compose and log storage.
   file:
-    dest: /opt/rsyslog_server/Docker
+    dest: "{{ item }}"
     state: directory
+  loop:
+    - /var/log/log_storage
+    - /opt/rsyslog_server/Docker
+
+- name: Copy certificates.
+  copy:
+    src:  "certs/{{ item }}"
+    dest: /etc/pki/rsyslog
+  loop:
+    - "{{ ansible_nodename }}-cert.pem"
+    - "{{ ansible_nodename }}-key.pem"
+    - ca.pem
 
 - name: Clone Docker Compose files.
-  get_url:
-    url:  "{{ item.url }}"
-    dest: "{{ item.dst }}"
+  copy:
+    src:  "roles/server/files/{{ item.src }}"
+    dest: "{{ config_dir }}{{ item.dst }}"
   loop:
-    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/docker-compose.yaml,
-       dst: /opt/rsyslog_server}
-    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/Dockerfile,
-       dst: /opt/rsyslog_server/Docker}
-    - {url: https://raw.githubusercontent.com/Lab-Brat/rsyslog_server/main/roles/server/files/rsyslog.conf,
-       dst: /opt/rsyslog_server/Docker}
+    - {src: docker-compose.yaml, dst: ''}
+    - {src: Dockerfile,    dst: Docker}
+    - {src: rsyslog.conf,  dst: Docker}    
+    - {src: entrypoint.sh, dst: Docker}
 
-- name: Run Docker Compose.
-  shell: "docker compose --project-directory /opt/rsyslog_server up -d"
+# - name: Run Docker Compose.
+#   shell: "docker compose --project-directory /opt/rsyslog_server up -d"
