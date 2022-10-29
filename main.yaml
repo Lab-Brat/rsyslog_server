@@ -4,21 +4,21 @@
     - rsyslog_server: "192.168.56.132"
 
   roles:
-    - role: client
-      vars:
-        journal_conf: "/etc/systemd/journald.conf"
-        journal_custom_conf: "/etc/systemd/journald.d/"
-        rsyslog_conf: "/etc/rsyslog.conf"
-      tags: client
-
-    - role: server 
-      vars:
-        - config_dir: /opt/rsyslog_server/
-      tags: server
-        
     - role: certificate
       vars:
         - cert_dir_remote: "/opt/rsyslog_certs/"
         - cert_dir_local:  "certs/"
         - new_CA: false
       tags: cert
+      
+    - role: client
+      vars:
+        journal_conf: "/etc/systemd/journald.conf"
+        journal_custom_conf: "/etc/systemd/journald.d/"
+      tags: client
+
+    - role: server 
+      vars:
+        - config_dir: /opt/rsyslog_server/
+      tags: server
+
