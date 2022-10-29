@@ -1,4 +1,7 @@
 ---
+- name: Disable SELinux.
+  include_tasks: disable_selinux.yaml
+  
 - name: Install rsyslog
   dnf:
     name: 
