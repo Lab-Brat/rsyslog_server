@@ -1,24 +1,34 @@
 ### Rsyslog Server
 #### Info
-rsyslog server is in a custom (built from Dockerfile in the repo) Docker container.  
+rsyslog server with TLS encryption.  
+CA and self-signed certificates are created using Ansible and [templates](https://www.rsyslog.com/doc/v8-stable/tutorials/tls_cert_script.html).  
 More info about the container:
 ```
 Name: rsyslog
 Image: rsyslog_server
-Ports: 514 tcp
-Storage: /var/log/log_storage mounted from host
+Ports: 5144 tcp
+Storage: /var/log/log_storage
+```
+
+#### Provision
+`vagrant` directory contains a `Vagrant` file that sets up a test environment.  
+Test environment contains 1 server and 1 client based on AlmaLinux, and it was tested on VirtualBox.  
+To set it up, navigate to the directory and run:
+```
+cd vagrant
+vagrant up
 ```
 
 #### Add server
-Server docker image can be installed with:
-```console
-ansilble-playbook main.yaml -t server --limit servers
+If it's the first time installation, `ca.pem` has to be created to sign self-signed certificates.  
+It can be done together with the server setup:
+```
+ansible-playbook main.yaml -t cert -t server --limit servers --extra-vars '{"new_CA": true}'
 ```
 
 #### Add client
-To add a client: 
-Then run `client.yaml` playbook
-```console
-ansilble-playbook main.yaml -t client --limit clients
+To configure a client, add it's IP address to `inventory.ini`, and then run:
 ```
-After it's done, check ```/var/log/log_storage``` directory on the server, a new folder will be created with the same name as the client's hostname.  
+ansilble-playbook main.yaml -t cert -t client --limit <client_ip>
+```
+After it's done, check `/var/log/log_storage` directory on the server, a new folder will be created with the same name as the client's hostname.  
