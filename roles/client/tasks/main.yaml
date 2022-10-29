@@ -40,12 +40,14 @@
 
 - name: Copy certificates.
   copy:
-    src:  "certs/{{ item }}"
-    dest: /etc/pki/rsyslog
+    src:  "certs/{{ item.src }}"
+    dest: "/etc/pki/rsyslog/{{ item.dst }}"
   loop:
-    - "{{ ansible_nodename }}-cert.pem"
-    - "{{ ansible_nodename }}-key.pem"
-    - ca.pem
+    - {src: "{{ ansible_nodename }}-cert.pem",
+       dst: rslclient-cert.pem}
+    - {src: "{{ ansible_nodename }}-key.pem",
+       dst: rslclient-key.pem}
+    - {src: ca.pem, dst: ca.pem}
 
 - name: Add rsyslog server info to configuration file
   copy:
