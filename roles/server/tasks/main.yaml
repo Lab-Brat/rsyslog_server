@@ -39,5 +39,5 @@
     - {src: rsyslog.conf,  dst: Docker}    
     - {src: entrypoint.sh, dst: Docker}
 
-# - name: Run Docker Compose.
-#   shell: "docker compose --project-directory /opt/rsyslog_server up -d"
+- name: Run Docker Compose.
+  shell: "docker compose --project-directory /opt/rsyslog_server up -d"
