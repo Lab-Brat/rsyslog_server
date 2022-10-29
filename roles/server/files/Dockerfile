@@ -9,7 +9,7 @@ COPY Docker/rsyslog.conf /etc/rsyslog.conf
 COPY Docker/entrypoint.sh /opt/entrypoint.sh
  
 # create a directory to store logs
-RUN mkdir /var/log/infra-logs
+RUN mkdir /var/log/log_storage
 
 # run rsyslog
 ENTRYPOINT ["/bin/bash", "/opt/entrypoint.sh"]

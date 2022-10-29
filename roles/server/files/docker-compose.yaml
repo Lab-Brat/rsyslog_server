@@ -10,9 +10,9 @@ services:
     restart: always
     volumes: 
       - "/var/log/log_storage:/var/log/log_storage"
-      - "/etc/pki/rsyslog:/etc/pki/rsyslog"
       - "/opt/rsyslog_certs:/opt/rsyslog_certs"
+      - "/etc/pki/rsyslog:/etc/pki/rsyslog"
     ports:
-      - "51440:51440"
+      - "5144:5144"
     cap_add:
       - SYSLOG
