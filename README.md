@@ -29,6 +29,6 @@ ansible-playbook main.yaml -t cert -t server --limit servers --extra-vars '{"new
 #### Add client
 To configure a client, add it's IP address to `inventory.ini`, and then run:
 ```
-ansilble-playbook main.yaml -t cert -t client --limit <client_ip>
+ansible-playbook main.yaml -t cert -t client --limit clients
 ```
 After it's done, check `/var/log/log_storage` directory on the server, a new folder will be created with the same name as the client's hostname.  
